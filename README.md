@@ -60,7 +60,7 @@ Run the chatbot:
 streamlit run app.py
 ```
 
-The app will open at `http://localhost:8501`
+The app will open
 
 **How to use:**
 1. Select a model from the dropdown at the top
