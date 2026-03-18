@@ -107,13 +107,6 @@ Amberg_Chatbot/
     ├── culture_museums.json
     └── ... (more JSON files)
 ```
-
-## Security Note
-
-⚠️ **Never commit your API key!**
-
-The `.env` file containing your `GOOGLE_API_KEY` is excluded from git. Always keep it secret and never share it publicly.
-
 ## Future Improvements
 
 - [ ] Persistent data store for conversation logs
@@ -122,19 +115,6 @@ The `.env` file containing your `GOOGLE_API_KEY` is excluded from git. Always ke
 - [ ] Voice input/output
 - [ ] Custom knowledge base management
 
-## Troubleshooting
-
-**"Cannot import name 'cached_download'"**
-- Update sentence-transformers: `pip install --upgrade sentence-transformers==3.0.1`
-
-**"API key not found"**
-- Ensure `.env` file exists in the project root
-- Check that `GOOGLE_API_KEY=your_key_here` is set correctly
-
-**"Model not available"**
-- The app automatically fetches available models from Google API
-- Ensure you have internet connection
-- Check your API key is valid
 
 ## License
 
