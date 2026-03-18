@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # =========================
 # API CONFIGURATION (TEMPORARY DEBUG - ROTATE AFTER 1 DAY!)
 # =========================
-GOOGLE_API_KEY = "AIzaSyBx-5xIgPYbr6ees-lHigiu79uWaZXWhqs"
+GOOGLE_API_KEY = ""
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Page config
