@@ -6,12 +6,22 @@ import numpy as np
 import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (for local development)
+load_dotenv()
 
 # =========================
-# API CONFIGURATION (TEMPORARY DEBUG - ROTATE AFTER 1 DAY!)
+# API CONFIGURATION
 # =========================
-GOOGLE_API_KEY = ""
-genai.configure(api_key=GOOGLE_API_KEY)
+# Try to get API key from Streamlit secrets (cloud) or environment variables (local)
+api_key = st.secrets.get("GOOGLE_API_KEY") if "GOOGLE_API_KEY" in st.secrets else os.getenv("GOOGLE_API_KEY")
+
+if not api_key:
+    st.error("❌ GOOGLE_API_KEY not configured. Please set it in Streamlit Cloud secrets or .env file.")
+    st.stop()
+
+genai.configure(api_key=api_key)
 
 # Page config
 st.set_page_config(page_title="Amberg Chatbot", page_icon="🏰", layout="centered")
@@ -52,6 +62,18 @@ all_snippets, embedding_model, faiss_index = load_system()
 @st.cache_resource
 def get_available_models():
     """Fetch all available Gemini models that support content generation"""
+    # Comprehensive fallback list (updated with latest Gemini models)
+    fallback_models = [
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-exp",
+        "gemini-2.0-pro-exp-02-05",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro",
+    ]
+
     try:
         models = genai.list_models()
         suitable_models = []
@@ -63,12 +85,11 @@ def get_available_models():
 
         if suitable_models:
             return sorted(suitable_models)
-        else:
-            return ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+    except Exception:
+        # Silently fall back to predefined list if API call fails
+        pass
 
-    except Exception as e:
-        st.error(f"Error fetching models: {str(e)}")
-        return ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+    return fallback_models
 
 available_models = get_available_models()
 
