@@ -6,10 +6,12 @@ import numpy as np
 import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# =========================
+# API CONFIGURATION (TEMPORARY DEBUG - ROTATE AFTER 1 DAY!)
+# =========================
+GOOGLE_API_KEY = "AIzaSyBx-5xIgPYbr6ees-lHigiu79uWaZXWhqs"
+genai.configure(api_key=GOOGLE_API_KEY)
 
 # Page config
 st.set_page_config(page_title="Amberg Chatbot", page_icon="🏰", layout="centered")
@@ -40,8 +42,6 @@ def load_system():
     index = faiss.IndexFlatL2(dimension)
     index.add(np.array(embeddings))
 
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
     return all_snippets, model, index
 
 all_snippets, embedding_model, faiss_index = load_system()
@@ -51,21 +51,24 @@ all_snippets, embedding_model, faiss_index = load_system()
 # =========================
 @st.cache_resource
 def get_available_models():
-    """Get all Gemini models that support generateContent"""
-    genai.configure(api_key="AIzaSyBE3Joz7iYkSIH0y_q1T_T76ZNJfme2C3Q")
+    """Fetch all available Gemini models that support content generation"""
     try:
         models = genai.list_models()
         suitable_models = []
+
         for model in models:
             if "generateContent" in model.supported_generation_methods:
-                suitable_models.append(model.name.replace("models/", ""))
-        return sorted(suitable_models)
-    except:
-        return [
-            "gemini-2.5-flash",
-            "gemini-1.5-flash",
-            "gemini-1.5-pro"
-        ]
+                model_name = model.name.replace("models/", "")
+                suitable_models.append(model_name)
+
+        if suitable_models:
+            return sorted(suitable_models)
+        else:
+            return ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+
+    except Exception as e:
+        st.error(f"Error fetching models: {str(e)}")
+        return ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
 
 available_models = get_available_models()
 
@@ -135,7 +138,6 @@ Question:
 Answer:
 """
 
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
     model_gemini = genai.GenerativeModel(model_name)
     response = model_gemini.generate_content(prompt)
     return response.text
